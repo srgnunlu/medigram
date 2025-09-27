@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "content_requests",
+  "info": {
+    "singularName": "content-request",
+    "pluralName": "content-requests",
+    "displayName": "Content Request",
+    "description": "User content submission requests for admin review"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 5,
+      "maxLength": 200
+    },
+    "content": {
+      "type": "text",
+      "required": true,
+      "minLength": 50
+    },
+    "category": {
+      "type": "string",
+      "required": true
+    },
+    "source": {
+      "type": "string",
+      "required": false
+    },
+    "submittedBy": {
+      "type": "string",
+      "required": true
+    },
+    "submittedByName": {
+      "type": "string",
+      "required": true
+    },
+    "submittedByEmail": {
+      "type": "email",
+      "required": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected", "published"],
+      "default": "pending",
+      "required": true
+    },
+    "adminNotes": {
+      "type": "text",
+      "required": false
+    },
+    "rejectionReason": {
+      "type": "string",
+      "required": false
+    },
+    "reviewedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "reviewedBy": {
+      "type": "string",
+      "required": false
+    },
+    "publishedMedicalCard": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::medical-card.medical-card",
+      "required": false
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "medical_cards",
+  "info": {
+    "singularName": "medical-card",
+    "pluralName": "medical-cards",
+    "displayName": "Medical Card"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "category": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "source": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string",
+      "required": false
+    }
+  }
+}
