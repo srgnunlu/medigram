@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:medigram/lib/config/app_config.dart';
+import 'package:medigram/core/config/environment.dart';
 import 'package:medigram/data/services/storage_service.dart';
 
 class ApiClient {
@@ -10,12 +10,14 @@ class ApiClient {
   late Dio _dio;
   final StorageService _storage = StorageService();
 
+  Dio get dio => _dio;
+
   ApiClient._internal() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: AppConfig.instance._baseUrl,
-        connectTimeout: AppConfig.instance.requestTimeout,
-        receiveTimeout: AppConfig.instance.requestTimeout,
+        baseUrl: Environment.apiBaseUrl,
+        connectTimeout: Environment.connectTimeout,
+        receiveTimeout: Environment.receiveTimeout,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
