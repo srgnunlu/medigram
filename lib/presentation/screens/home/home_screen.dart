@@ -6,6 +6,8 @@ import 'package:medigram/presentation/controllers/auth_controller.dart';
 import 'package:medigram/presentation/controllers/medical_card_controller.dart';
 import 'package:medigram/presentation/controllers/category_controller.dart';
 import 'package:medigram/presentation/widgets/cards/medical_card_widget.dart';
+import 'package:medigram/presentation/widgets/ai/recommendations_widget.dart';
+import 'package:medigram/presentation/screens/ai/ai_studio_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,6 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(AppConstants.appName),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            onPressed: () => Get.to(() => const AIStudioScreen()),
+            tooltip: 'AI Studio',
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
@@ -153,9 +160,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       vertical: AppConstants.spacingS,
                     ),
                     itemCount: cardController.medicalCards.length +
-                        (cardController.isLoadingMore ? 1 : 0),
+                        (cardController.isLoadingMore ? 1 : 0) +
+                        1, // +1 for recommendations widget
                     itemBuilder: (context, index) {
-                      if (index == cardController.medicalCards.length) {
+                      // Show recommendations widget at index 0
+                      if (index == 0) {
+                        return const RecommendationsWidget();
+                      }
+
+                      // Adjust index for cards (offset by 1 due to recommendations widget)
+                      final cardIndex = index - 1;
+
+                      if (cardIndex == cardController.medicalCards.length) {
                         return const Center(
                           child: Padding(
                             padding: EdgeInsets.all(AppConstants.spacingM),
@@ -164,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
 
-                      final card = cardController.medicalCards[index];
+                      final card = cardController.medicalCards[cardIndex];
                       return MedicalCardWidget(card: card);
                     },
                   ),
