@@ -17,6 +17,9 @@ class AppRoutes {
   // Medical Card Routes
   static const String cardDetail = '/card-detail';
 
+  // Saved Cards
+  static const String savedCards = '/saved-cards';
+
   // Settings Routes
   static const String settings = '/settings';
 }

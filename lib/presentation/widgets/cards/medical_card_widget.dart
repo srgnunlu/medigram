@@ -7,6 +7,7 @@ import 'package:medigram/core/constants/app_constants.dart';
 import 'package:medigram/core/utils/date_formatter.dart';
 import 'package:medigram/presentation/controllers/medical_card_controller.dart';
 import 'package:medigram/presentation/controllers/auth_controller.dart';
+import 'package:medigram/presentation/screens/card/card_detail_screen.dart';
 
 class MedicalCardWidget extends StatelessWidget {
   final MedicalCard card;
@@ -21,12 +22,16 @@ class MedicalCardWidget extends StatelessWidget {
     final cardController = Get.find<MedicalCardController>();
     final authController = Get.find<AuthController>();
 
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppConstants.spacingM,
-        vertical: AppConstants.spacingS,
-      ),
-      child: Column(
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => CardDetailScreen(card: card));
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacingM,
+          vertical: AppConstants.spacingS,
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
@@ -232,6 +237,7 @@ class MedicalCardWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
