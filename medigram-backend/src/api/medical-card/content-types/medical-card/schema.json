@@ -32,6 +32,31 @@
     "author": {
       "type": "string",
       "required": false
+    },
+    "subcategory": {
+      "type": "string"
+    },
+    "thumbnail": {
+      "type": "string"
+    },
+    "aiImagePrompt": {
+      "type": "text"
+    },
+    "likes": {
+      "type": "json",
+      "default": "[]"
+    },
+    "commentCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "shareCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "isPremium": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

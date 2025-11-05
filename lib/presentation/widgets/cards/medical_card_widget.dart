@@ -7,7 +7,9 @@ import 'package:medigram/core/constants/app_constants.dart';
 import 'package:medigram/core/utils/date_formatter.dart';
 import 'package:medigram/presentation/controllers/medical_card_controller.dart';
 import 'package:medigram/presentation/controllers/auth_controller.dart';
+import 'package:medigram/presentation/controllers/premium_controller.dart';
 import 'package:medigram/presentation/screens/card/card_detail_screen.dart';
+import 'package:medigram/presentation/widgets/common/premium_lock_widget.dart';
 
 class MedicalCardWidget extends StatelessWidget {
   final MedicalCard card;
@@ -21,6 +23,7 @@ class MedicalCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardController = Get.find<MedicalCardController>();
     final authController = Get.find<AuthController>();
+    final premiumController = Get.put(PremiumController());
 
     return GestureDetector(
       onTap: () {
@@ -102,49 +105,81 @@ class MedicalCardWidget extends StatelessWidget {
           // Content
           Padding(
             padding: const EdgeInsets.all(AppConstants.spacingM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  card.title,
-                  style: Theme.of(context).textTheme.titleLarge,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppConstants.spacingS),
+            child: Obx(() {
+              final isPremiumUser = premiumController.isPremium;
+              final shouldLock = card.isPremium && !isPremiumUser;
 
-                // Content preview
-                Text(
-                  card.content,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppConstants.spacingM),
-
-                // Source
-                if (card.source.isNotEmpty)
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.source,
-                        size: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: AppConstants.spacingXS),
-                      Expanded(
-                        child: Text(
-                          'Kaynak: ${card.source}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+              return PremiumLockWidget(
+                isPremiumContent: shouldLock,
+                showBlur: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Premium badge
+                    if (card.isPremium)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppConstants.spacingS),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: 16,
+                              color: AppColors.accent,
+                            ),
+                            const SizedBox(width: AppConstants.spacingXS),
+                            Text(
+                              'Premium İçerik',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: AppColors.accent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-              ],
-            ),
+
+                    // Title
+                    Text(
+                      card.title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppConstants.spacingS),
+
+                    // Content preview
+                    Text(
+                      card.content,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppConstants.spacingM),
+
+                    // Source
+                    if (card.source.isNotEmpty)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.source,
+                            size: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: AppConstants.spacingXS),
+                          Expanded(
+                            child: Text(
+                              'Kaynak: ${card.source}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            }),
           ),
 
           // Actions

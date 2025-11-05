@@ -14,6 +14,7 @@ class MedicalCard extends Equatable {
   final List<String> likes;
   final int commentCount;
   final int shareCount;
+  final bool isPremium;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -28,6 +29,7 @@ class MedicalCard extends Equatable {
     required this.source,
     required this.author,
     this.aiImagePrompt,
+    this.isPremium = false,
     required this.likes,
     required this.commentCount,
     required this.shareCount,
@@ -53,6 +55,7 @@ class MedicalCard extends Equatable {
       likes: _parseLikes(data['likes']),
       commentCount: data['commentCount'] ?? 0,
       shareCount: data['shareCount'] ?? 0,
+      isPremium: data['isPremium'] ?? false,
       createdAt: DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
       updatedAt: DateTime.parse(data['updatedAt'] ?? DateTime.now().toIso8601String()),
     );
@@ -99,6 +102,7 @@ class MedicalCard extends Equatable {
       'likes': likes,
       'commentCount': commentCount,
       'shareCount': shareCount,
+      'isPremium': isPremium,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -118,6 +122,7 @@ class MedicalCard extends Equatable {
     List<String>? likes,
     int? commentCount,
     int? shareCount,
+    bool? isPremium,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -135,6 +140,7 @@ class MedicalCard extends Equatable {
       likes: likes ?? this.likes,
       commentCount: commentCount ?? this.commentCount,
       shareCount: shareCount ?? this.shareCount,
+      isPremium: isPremium ?? this.isPremium,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -159,6 +165,7 @@ class MedicalCard extends Equatable {
         likes,
         commentCount,
         shareCount,
+        isPremium,
         createdAt,
         updatedAt,
       ];
