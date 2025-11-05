@@ -27,7 +27,8 @@ const customRoutes = [
     path: '/content-requests/submit',
     handler: 'api::content-request.content-request.submit',
     config: {
-      auth: false,
+      auth: true, // Authenticated users can submit
+      policies: [],
     },
   },
   {
@@ -35,7 +36,8 @@ const customRoutes = [
     path: '/content-requests/:id/approve',
     handler: 'api::content-request.content-request.approve',
     config: {
-      auth: false,
+      auth: true,
+      policies: ['admin::is-admin'], // Only admins can approve
     },
   },
   {
@@ -43,7 +45,8 @@ const customRoutes = [
     path: '/content-requests/:id/reject',
     handler: 'api::content-request.content-request.reject',
     config: {
-      auth: false,
+      auth: true,
+      policies: ['admin::is-admin'], // Only admins can reject
     },
   },
   {
@@ -51,7 +54,8 @@ const customRoutes = [
     path: '/content-requests/:id/publish',
     handler: 'api::content-request.content-request.publish',
     config: {
-      auth: false,
+      auth: true,
+      policies: ['admin::is-admin'], // Only admins can publish
     },
   },
   {
@@ -59,7 +63,8 @@ const customRoutes = [
     path: '/content-requests/pending',
     handler: 'api::content-request.content-request.pending',
     config: {
-      auth: false,
+      auth: true,
+      policies: ['admin::is-admin'], // Only admins can view pending
     },
   },
 ];
