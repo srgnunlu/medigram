@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "subscriptions",
+  "info": {
+    "singularName": "subscription",
+    "pluralName": "subscriptions",
+    "displayName": "Subscription",
+    "description": "Premium subscription management"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "subscriptions"
+    },
+    "iyzicoSubscriptionId": {
+      "type": "string",
+      "unique": true
+    },
+    "iyzicoPaymentId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["active", "cancelled", "expired", "pending"],
+      "default": "pending"
+    },
+    "plan": {
+      "type": "enumeration",
+      "enum": ["monthly", "yearly"],
+      "default": "monthly"
+    },
+    "amount": {
+      "type": "decimal"
+    },
+    "currency": {
+      "type": "string",
+      "default": "TRY"
+    },
+    "startDate": {
+      "type": "datetime"
+    },
+    "endDate": {
+      "type": "datetime"
+    },
+    "autoRenew": {
+      "type": "boolean",
+      "default": true
+    },
+    "cancelledAt": {
+      "type": "datetime"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ai_usages",
+  "info": {
+    "singularName": "ai-usage",
+    "pluralName": "ai-usages",
+    "displayName": "AI Usage",
+    "description": "Track AI feature usage for analytics and billing"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "aiUsages"
+    },
+    "feature": {
+      "type": "enumeration",
+      "enum": [
+        "image_generation",
+        "content_generation",
+        "image_analysis",
+        "recommendations"
+      ],
+      "required": true
+    },
+    "prompt": {
+      "type": "text"
+    },
+    "cost": {
+      "type": "decimal",
+      "default": 0
+    },
+    "metadata": {
+      "type": "json"
+    }
+  }
+}

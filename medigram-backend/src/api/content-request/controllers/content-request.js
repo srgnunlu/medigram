@@ -10,23 +10,48 @@ module.exports = createCoreController('api::content-request.content-request', ({
   // Custom method to submit content request
   async submit(ctx) {
     try {
-      const { title, content, category, source, submittedBy, submittedByName, submittedByEmail } = ctx.request.body;
+      const { title, content, category, source, submittedByEmail } = ctx.request.body;
+      const user = ctx.state.user;
 
       // Validate required fields
-      if (!title || !content || !category || !submittedBy || !submittedByName) {
-        return ctx.badRequest('Missing required fields');
+      if (!title || !content || !category) {
+        return ctx.badRequest('Missing required fields: title, content, and category are required');
       }
 
-      // Create content request
+      // Validate title length (5-200 characters as per schema)
+      if (title.length < 5 || title.length > 200) {
+        return ctx.badRequest('Title must be between 5 and 200 characters');
+      }
+
+      // Validate content length (minimum 50 characters as per schema)
+      if (content.length < 50) {
+        return ctx.badRequest('Content must be at least 50 characters long');
+      }
+
+      // Validate email format if provided
+      if (submittedByEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(submittedByEmail)) {
+          return ctx.badRequest('Invalid email format');
+        }
+      }
+
+      // Sanitize inputs to prevent XSS
+      const sanitize = require('@strapi/utils').sanitize;
+      const sanitizedTitle = title.trim();
+      const sanitizedContent = content.trim();
+      const sanitizedSource = source ? source.trim() : null;
+
+      // Create content request with authenticated user info
       const contentRequest = await strapi.entityService.create('api::content-request.content-request', {
         data: {
-          title,
-          content,
+          title: sanitizedTitle,
+          content: sanitizedContent,
           category,
-          source,
-          submittedBy,
-          submittedByName,
-          submittedByEmail,
+          source: sanitizedSource,
+          submittedBy: user.id.toString(),
+          submittedByName: user.username || user.email,
+          submittedByEmail: submittedByEmail || user.email,
           status: 'pending',
           publishedAt: new Date(),
         },
@@ -48,13 +73,29 @@ module.exports = createCoreController('api::content-request.content-request', ({
     try {
       const { id } = ctx.params;
       const { adminNotes } = ctx.request.body;
+      const user = ctx.state.user;
+
+      // Check if content request exists
+      const existingRequest = await strapi.entityService.findOne('api::content-request.content-request', id);
+
+      if (!existingRequest) {
+        return ctx.notFound('Content request not found');
+      }
+
+      // Check if already processed
+      if (existingRequest.status !== 'pending') {
+        return ctx.badRequest(`Content request is already ${existingRequest.status}`);
+      }
+
+      // Sanitize admin notes
+      const sanitizedNotes = adminNotes ? adminNotes.trim() : null;
 
       const contentRequest = await strapi.entityService.update('api::content-request.content-request', id, {
         data: {
           status: 'approved',
-          adminNotes,
+          adminNotes: sanitizedNotes,
           reviewedAt: new Date(),
-          reviewedBy: ctx.state.user?.id || 'admin',
+          reviewedBy: user.username || user.email,
         },
       });
 
@@ -74,13 +115,31 @@ module.exports = createCoreController('api::content-request.content-request', ({
     try {
       const { id } = ctx.params;
       const { rejectionReason } = ctx.request.body;
+      const user = ctx.state.user;
+
+      // Validate rejection reason is provided
+      if (!rejectionReason || rejectionReason.trim().length === 0) {
+        return ctx.badRequest('Rejection reason is required');
+      }
+
+      // Check if content request exists
+      const existingRequest = await strapi.entityService.findOne('api::content-request.content-request', id);
+
+      if (!existingRequest) {
+        return ctx.notFound('Content request not found');
+      }
+
+      // Check if already processed
+      if (existingRequest.status !== 'pending') {
+        return ctx.badRequest(`Content request is already ${existingRequest.status}`);
+      }
 
       const contentRequest = await strapi.entityService.update('api::content-request.content-request', id, {
         data: {
           status: 'rejected',
-          rejectionReason,
+          rejectionReason: rejectionReason.trim(),
           reviewedAt: new Date(),
-          reviewedBy: ctx.state.user?.id || 'admin',
+          reviewedBy: user.username || user.email,
         },
       });
 
@@ -99,6 +158,7 @@ module.exports = createCoreController('api::content-request.content-request', ({
   async publish(ctx) {
     try {
       const { id } = ctx.params;
+      const { imageUrl, thumbnail, subcategory, difficulty, isPremium } = ctx.request.body;
 
       // Get the content request
       const contentRequest = await strapi.entityService.findOne('api::content-request.content-request', id);
@@ -111,21 +171,34 @@ module.exports = createCoreController('api::content-request.content-request', ({
         return ctx.badRequest('Content request must be approved before publishing');
       }
 
+      // Check if already published
+      if (contentRequest.publishedMedicalCard) {
+        return ctx.badRequest('Content request has already been published');
+      }
+
+      // Validate required fields for medical card
+      if (!imageUrl || !thumbnail || !subcategory) {
+        return ctx.badRequest('imageUrl, thumbnail, and subcategory are required for publishing');
+      }
+
+      // Calculate reading time (average 200 words per minute, ~5 chars per word)
+      const estimatedWords = contentRequest.content.length / 5;
+      const readingTimeMinutes = Math.max(1, Math.ceil(estimatedWords / 200));
+
       // Create medical card from content request
       const medicalCard = await strapi.entityService.create('api::medical-card.medical-card', {
         data: {
           title: contentRequest.title,
           content: contentRequest.content,
           category: contentRequest.category,
-          source: contentRequest.source,
+          subcategory: subcategory,
+          imageUrl: imageUrl,
+          thumbnail: thumbnail,
+          source: contentRequest.source || 'User Submission',
           author: contentRequest.submittedByName,
-          tags: [contentRequest.category],
-          likes: [],
-          shareCount: 0,
+          likes: JSON.stringify([]),
           commentCount: 0,
-          readingTimeMinutes: Math.ceil(contentRequest.content.length / 1000), // Estimate reading time
-          difficulty: 'Orta', // Default difficulty
-          isPremium: false,
+          shareCount: 0,
           publishedAt: new Date(),
         },
       });

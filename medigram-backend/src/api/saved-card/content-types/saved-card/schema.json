@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "saved_cards",
+  "info": {
+    "singularName": "saved-card",
+    "pluralName": "saved-cards",
+    "displayName": "Saved Card",
+    "description": "Users saved medical cards"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "savedCards"
+    },
+    "medicalCard": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::medical-card.medical-card"
+    }
+  }
+}
